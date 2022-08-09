@@ -15,13 +15,18 @@ class WebPush:
             print("Trigger Push gönderildi.")
         elif self.push_type == 'segment':
             print("Segment Push gönderildi.")
+        elif self.push_type == 'in_stock':
+            print("In Stock Push gönderildi.")
+        elif self.push_type == 'price_alert':
+            print("Price Alert Push gönderildi.")
         else:
-            print("Push gönderildi.")
+            print("Push gönderilemedi.")
 
     def show_info(self):
-        print("""Platform: {} \nOptin: {} \nGlobal Frequency Capping: {} \nStart Date:{} \nEnd Date:{} \nLanguage:{}
-        \nPush Type:{} """.format(self.platform, self.optin, self.global_frequency_capping,
-                                  self.start_date, self.end_date, self.language, self.push_type))
+        print("Platform: {}\nOptin: {}\nGlobal Frequency Capping: {}\nStart Date:{}\nEnd Date:{}\nLanguage:{}"
+              "\nPush Type: {}\n"
+              .format(self.platform, self.optin, self.global_frequency_capping,
+                      self.start_date, self.end_date, self.language, self.push_type))
 
 
 class TriggerPush(WebPush):
@@ -30,24 +35,12 @@ class TriggerPush(WebPush):
         super().__init__(platform, optin, global_frequency_capping, start_date, end_date, language, push_type)
         self.trigger_page = trigger_page
 
-    def show_info(self):
-        print("""Platform: {} \nOptin:{} \nGlobal Frequency Capping:{} \nStart Date:{} \nEnd Date:{} \nLanguage:{} 
-        \nPush Type:{} \nTrigger Page:{}"""
-              .format(self.platform, self.optin, self.global_frequency_capping, self.start_date, self.end_date,
-                      self.language, self.push_type, self.trigger_page))
-
 
 class BulkPush(WebPush):
     def __init__(self, platform, optin, global_frequency_capping, start_date, end_date, language, push_type,
                  send_date):
         super().__init__(platform, optin, global_frequency_capping, start_date, end_date, language, push_type)
         self.send_date = send_date
-
-    def show_info(self):
-        print("""Platform: {} \nOptin: {} \nGlobal Frequency Capping: {} \nStart Date:{} \nEnd Date:{} \nLanguage:{} 
-        \nPush Type:{} \nSend Date:{}"""
-              .format(self.platform, self.optin, self.global_frequency_capping, self.start_date, self.end_date,
-                      self.language, self.push_type, self.send_date))
 
 
 class SegmentPush(WebPush):
@@ -56,16 +49,11 @@ class SegmentPush(WebPush):
         super().__init__(platform, optin, global_frequency_capping, start_date, end_date, language, push_type)
         self.segment_name = segment_name
 
-    def show_info(self):
-        print("""Platform:{} \nOptin:{} \nGlobal Frequency Capping:{} \nStart Date:{} \nEnd Date:{} \nLanguage:{} 
-        \nPush Type:{} \nSegment Name:{}"""
-              .format(self.platform, self.optin, self.global_frequency_capping, self.start_date, self.end_date,
-                      self.language, self.push_type, self.segment_name))
-
 
 class PriceAlertPush(WebPush):
-    def discountPrice(self, price_info, discount_rate):
-        return price_info - (price_info * discount_rate)
+    def discount_price(self, price_info, discount_rate):
+        discount_price = price_info - (price_info * discount_rate)
+        return discount_price
 
 
 class InstockPush(WebPush):
@@ -74,15 +62,9 @@ class InstockPush(WebPush):
         super().__init__(platform, optin, global_frequency_capping, start_date, end_date, language, push_type)
         self.stock_info = stock_info
 
-    def show_info(self):
-        print("""Platform:{} \nOptin:{} \nGlobal Frequency Capping:{} \nStart Date:{} \nEnd Date:{} \nLanguage:{} 
-        \nPush Type:{} \nStock Info:{}"""
-              .format(self.platform, self.optin, self.global_frequency_capping, self.start_date, self.end_date,
-                      self.language, self.push_type, self.stock_info))
-
     def stockUpdate(self):
         if self.stock_info:
-            return not self.stock_info
+            return self.stock_info
         else:
             return not self.stock_info
 
@@ -99,14 +81,13 @@ sp = SegmentPush("Mac", False, "GFC-3", 2, 15, "TR", "segment", "custom 1")
 sp.send_push()
 sp.show_info()
 
-pp = PriceAlertPush("Windows", True, "GFC-4", 1, 28, "EN", "web")
+pp = PriceAlertPush("Windows", True, "GFC-4", 1, 28, "EN", "price_alert")
 pp.send_push()
 pp.show_info()
-print("price with discount:", pp.discountPrice(50, .1))
+print("price with discount:", pp.discount_price(50, .1))
 
-ip = InstockPush("Mac", True, "GFC-5", 5, 10, "SP", "web", True)
+ip = InstockPush("Mac", True, "GFC-5", 5, 10, "SP", "in_stock", True)
 ip.send_push()
 ip.show_info()
 ip.stockUpdate()
 print("stock is now:", ip.stockUpdate())
-
